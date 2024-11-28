@@ -1,0 +1,116 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = false
+format = '''[${custom.note}](green)[${custom.leave}](green)
+${custom.folders}[$fill](bg:white)
+${custom.pwd_link_start}[$directory](${custom.git_status_color})${custom.pwd_link_end}$git_status
+$cmd_duration$memory_usage[$shell](bold green)$character${env_var.VIRTUAL_ENV}'''
+
+[character] # The name of the module we are configuring is 'character'
+success_symbol = '''[](bg:white)[\)>](bold green)''' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+
+error_symbol = '''[](bg:white)[\)>](bold red)''' # The 'success_symbol' segment is being set to '➜' with the color 'bold green'
+
+[battery]
+disabled= false
+
+[directory]
+truncation_length = 3
+truncation_symbol = '…/'
+style = "white"
+truncate_to_repo=false
+repo_root_style="red"
+fish_style_pwd_dir_length=6
+
+[python]
+format=' [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+
+[package]
+format='[$symbol$version]($style) '
+
+[shell]
+disabled = false
+format = "[$indicator](white)"
+
+[cmd_duration]
+min_time = 60000
+format = '[\($duration\)](bold yellow)'
+show_notifications=true
+show_milliseconds=false
+
+[fill]
+symbol = ' '
+style = 'style*'
+
+[git_branch]
+format='[$branch(:$remote_branch)]($style)'
+
+# ~/.config/starship.toml
+
+[username]
+style_user = 'white bold'
+style_root = 'red bold'
+format = '[\(](green bold)[$user]($style)[\)](green bold)'
+disabled = false
+show_always = true
+
+[custom.folders]
+description = "lists visible folders by modified date"
+command = "let max_width = 55; ls [!._]* | where type == dir | sort-by modified -r | reduce -f \"\" { |it, acc| let new_line = if $acc == \"\" { $it.name } else { $acc + \" | \" + $it.name }; if ($new_line | str length) <= $max_width { $new_line } else { $acc } } | str trim"
+when = "true"
+shell = ['nu']
+style = "bg:white fg:black"
+format = "[$output]($style)"
+
+[custom.note]
+description = "Display first line of .note file (once per hour)"
+command = """
+
+  let note_files = ls -l *.note
+  if ($note_files | length) > 0 {
+    let first_note = $note_files | first;
+    if (date now) - $first_note.accessed > 1hr {
+      let first_line = ($first_note.name | open | lines | first);
+      $"($first_line)"
+    }
+  }
+
+"""
+when = true
+shell = ['nu']
+detect_extensions = ['.note', '.leave']
+style = "style*"
+
+[custom.leave]
+description = "Display first line of .leave file (once per hour)"
+command = """
+  let leave_files = ls -l $env.oldpwd | where name =~ .leave
+  if ($leave_files | length) > 0 {
+    let first_leave = $leave_files | first;
+    if (date now) - $first_leave.accessed > 5min {
+      let first_line_leave = ($first_leave.name | open | lines | first);
+      $"($first_line_leave)"
+      # print "TEST"
+    }
+  }
+"""
+when = true
+shell = ['nu']
+detect_extensions = ['.leave']
+style = "style*"
+
+[custom.pwd_link_start]
+command = 'echo $env.pwd'  # Change this for other shells or OS
+when = true
+format = "\u001b\\]8;;[file:$output]()\u001b\\\\"
+
+[custom.pwd_link_end]
+format = "\u001b\\]8;;\u001b\\\\"
+when = true
+
+[env_var.VIRTUAL_ENV]
+style = "green bold"
+symbol = "🍀"
+format = '[$symbol]($style)'
