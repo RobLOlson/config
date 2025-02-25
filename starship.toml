@@ -56,9 +56,14 @@ format = '[\(](green bold)[$user]($style)[\)](green bold)'
 disabled = false
 show_always = true
 
+# let lines = ls [!._]* --long | where type == dir | sort-by accessed -r | reduce -f "" { |it, acc| let new_line = if $acc == "" { ($it.name | str substring ..6)} else { $acc + " | " + $it.name }; if ($new_line | str length) <= $max_width { $new_line } else { $acc } } | str trim;
+
 [custom.folders]
 description = "lists visible folders by modified date"
-command = "let max_width = 55; ls [!._]* | where type == dir | sort-by modified -r | reduce -f \"\" { |it, acc| let new_line = if $acc == \"\" { $it.name } else { $acc + \" | \" + $it.name }; if ($new_line | str length) <= $max_width { $new_line } else { $acc } } | str trim"
+command = """let max_width = (open 'C:\\users\\sterl\\.config\\columns.txt' | into int);
+let lines = ls [!._]* --long | where type == dir | sort-by accessed -r | get name | each {|$e| if ($e | str length) > 13 {($e | str substring 0..9) + "..."} else {$e}}
+let line = $lines | reduce -f "" { |it, acc| $acc + " | " + $it};
+if ($line | str length) > $max_width {($line | str substring 2..$max_width | str substring 0..-5) + " -->"} else {$line | str substring 2..}"""
 when = "true"
 shell = ['nu']
 style = "bg:white fg:black"
