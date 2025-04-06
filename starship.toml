@@ -58,8 +58,11 @@ show_always = true
 
 # let lines = ls [!._]* --long | where type == dir | sort-by accessed -r | reduce -f "" { |it, acc| let new_line = if $acc == "" { ($it.name | str substring ..6)} else { $acc + " | " + $it.name }; if ($new_line | str length) <= $max_width { $new_line } else { $acc } } | str trim;
 
+
+
 [custom.folders]
 description = "lists visible folders by modified date"
+# uses a hook in `config.nu` to store terminal column width
 command = """let max_width = (open 'C:\\users\\sterl\\.config\\columns.txt' | into int);
 let lines = ls [!._]* --long | where type == dir | sort-by accessed -r | get name | each {|$e| if ($e | str length) > 13 {($e | str substring 0..9) + "..."} else {$e}}
 let line = $lines | reduce -f "" { |it, acc| $acc + " | " + $it};
