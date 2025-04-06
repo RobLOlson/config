@@ -5,7 +5,7 @@
 add_newline = false
 format = '''[${custom.note}](green)[${custom.leave}](green)
 ${custom.folders}[$fill](bg:white)
-${custom.pwd_link_start}[$directory](${custom.git_status_color})${custom.pwd_link_end}$git_status
+[$directory](${custom.git_status_color})$git_status
 $cmd_duration$memory_usage[$shell](bold green)$character${env_var.VIRTUAL_ENV}'''
 
 [character] # The name of the module we are configuring is 'character'
@@ -106,14 +106,15 @@ shell = ['nu']
 detect_extensions = ['.leave']
 style = "style*"
 
-[custom.pwd_link_start]
-command = 'echo $env.pwd'  # Change this for other shells or OS
-when = true
-format = "\u001b\\]8;;[file:$output]()\u001b\\\\"
+# Pretty Sure these two can be deleted
+# [custom.pwd_link_start]
+# command = 'echo $env.pwd'  # Change this for other shells or OS
+# when = true
+# format = "\u001b\\]8;;[file:$output]()\u001b\\\\"
 
-[custom.pwd_link_end]
-format = "\u001b\\]8;;\u001b\\\\"
-when = true
+# [custom.pwd_link_end]
+# format = "\u001b\\]8;;\u001b\\\\"
+# when = true
 
 [env_var.VIRTUAL_ENV]
 style = "green bold"
