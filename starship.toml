@@ -1,3 +1,5 @@
+# ~/.config/starship.toml
+
 # Get editor completions based on the config schema
 "$schema" = 'https://starship.rs/config-schema.json'
 
@@ -47,7 +49,6 @@ style = 'style*'
 [git_branch]
 format='[$branch(:$remote_branch)]($style)'
 
-# ~/.config/starship.toml
 
 [username]
 style_user = 'white bold'
@@ -64,7 +65,7 @@ show_always = true
 description = "lists visible folders by modified date"
 # uses a hook in `config.nu` to store terminal column width
 command = """let max_width = (open 'C:\\users\\sterl\\.config\\columns.txt' | into int);
-let lines = ls [!._]* --long | where type == dir | sort-by accessed -r | get name | each {|$e| if ($e | str length) > 13 {($e | str substring 0..9) + "..."} else {$e}}
+let lines = ls [!._]* --long | where type == dir | sort-by modified -r | get name | each {|$e| if ($e | str length) > 13 {($e | str substring 0..9) + "..."} else {$e}}
 let line = $lines | reduce -f "" { |it, acc| $acc + " | " + $it};
 if ($line | str length) > $max_width {($line | str substring 2..$max_width | str substring 0..-5) + " -->"} else {$line | str substring 2..}"""
 when = "true"
@@ -94,10 +95,10 @@ style = "style*"
 [custom.leave]
 description = "Display first line of .leave file (once per hour)"
 command = """
-  let leave_files = ls -l $env.oldpwd | where name =~ .leave
+  let leave_files = ls -la $env.oldpwd | where name =~ .leave
   if ($leave_files | length) > 0 {
     let first_leave = $leave_files | first;
-    if (date now) - $first_leave.accessed > 5min {
+    if (date now) - $first_leave.accessed > 1hr {
       let first_line_leave = ($first_leave.name | open | lines | first);
       $"($first_line_leave)"
       # print "TEST"
